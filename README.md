@@ -51,13 +51,13 @@
 - [mihomoScript.js（全量版）](/Script/mihomoScript.js)，复制下面这个链接使用👇👇👇
 
 ```txt
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/mihomoScript.js
+https://raw.githubusercontent.com/lll33lll/MyClash/main/Script/mihomoScript.js
 ```
 
 - [Script.js（精简版）](/Script/Script.js)，仅包含少量分流策略组，复制下面这个链接使用👇👇👇
 
 ```txt
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/Script.js
+https://raw.githubusercontent.com/lll33lll/MyClash/main/Script/Script.js
 ```
 
 |                                                                                   |
@@ -82,13 +82,13 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/Script.js
 - [mihomoConfig.yaml（全量版）](/Config/mihomoConfig.yaml)，复制下面这个链接使用👇👇👇
 
 ```txt
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfig.yaml
+https://raw.githubusercontent.com/lll33lll/MyClash/main/Config/mihomoConfig.yaml
 ```
 
 - [mihomoConfigLite.yaml（精简版）](/Config/mihomoConfigLite.yaml)，仅包含少量分流策略组，复制下面这个链接使用👇👇👇
 
 ```txt
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfigLite.yaml
+https://raw.githubusercontent.com/lll33lll/MyClash/main/Config/mihomoConfigLite.yaml
 ```
 
 ## 功能说明
