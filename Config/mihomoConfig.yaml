@@ -83,7 +83,7 @@ dns:
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/15
   fake-ip-range6: 2001:2::1/48
-  fake-ip-filter: ['rule-set:private', 'rule-set:fakeip_filter', 'rule-set:geolocation-cn']
+  fake-ip-filter: ['rule-set:private', 'rule-set:fakeip_filter', 'rule-set:geolocation-cn', 'rule-set:googlefcm']
   proxy-server-nameserver: *chinaDohDNS
   default-nameserver: *chinaDohDNS
   nameserver: *foreignDNS
@@ -214,11 +214,21 @@ rule-providers:
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft.mrs'
     path: './ruleset/microsoft.mrs'
     path-in-bundle: 'geo/geosite/microsoft.mrs'
+  microsoft_ip:
+    <<: *rule_providers_ip
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/microsoft.mrs'
+    path: './ruleset/microsoft_ip.mrs'
+    path-in-bundle: 'geo/geoip/microsoft.mrs'
   apple:
     <<: *rule_providers_domain
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple.mrs'
     path: './ruleset/apple.mrs'
     path-in-bundle: 'geo/geosite/apple.mrs'
+  apple_ip:
+    <<: *rule_providers_ip
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/apple.mrs'
+    path: './ruleset/apple_ip.mrs'
+    path-in-bundle: 'geo/geoip/apple.mrs'
   telegram:
     <<: *rule_providers_domain
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/telegram.mrs'
@@ -440,11 +450,11 @@ group_filter:
   TW_filter: &TW_filter { filter: '(?i)(🇹🇼|台湾|台北|高雄|(?<![A-Za-z])TWN?(?![A-Za-z])|taiwan)' }
   low_filter:
     &low_filter {
-      filter: '(?i)(^(?!.*(?:剩|期)).*(?:(?<!\d)0\.[0-5]|(?<=[ |｜丨∣┃\-‐–—−－﹣])0[*×✕✖⨯⨉x倍])|(?:(?<=[ |｜丨∣┃\-‐–—−－﹣])[*×✕✖⨯⨉x]0(?= |倍|$))|^(?!.*(?:客户端|软件)).*下载|低倍|免费|(?<![A-Za-z])free(?![A-Za-z]))',
+      filter: '(?i)(^(?!.*(?:剩|期)).*(?:(?<!\d)0\.[0-5]|(?<=[ \[\(|｜丨∣┃\-‐–—−－﹣])0[*×✕✖⨯⨉x倍])|(?:(?<=[ \[\(|｜丨∣┃\-‐–—−－﹣])[*×✕✖⨯⨉x]0(?=[ \)\]]|倍|$))|^(?!.*(?:客户端|软件)).*下载|低倍|免费|(?<![A-Za-z])free(?![A-Za-z]))',
     }
   high_filter:
     &high_filter {
-      filter: '(?i)(?<=[ |｜丨∣┃\-‐–—−－﹣])((?:[*×✕✖⨯⨉x]\s*(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?)|(?:(?<![\d.])(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?\s*(?:倍|[*×✕✖⨯⨉x])))',
+      filter: '(?i)(?<=[ \[\(|｜丨∣┃\-‐–—−－﹣])((?:[*×✕✖⨯⨉x]\s*(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?)|(?:(?<![\d.])(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?\s*(?:倍|[*×✕✖⨯⨉x])))',
     }
   exclude_filter:
     &exclude_filter {
@@ -666,7 +676,9 @@ rules:
   - RULE-SET,ai,AI
   - RULE-SET,github,默认代理
   - RULE-SET,microsoft,Microsoft
+  - RULE-SET,microsoft_ip,Microsoft,no-resolve
   - RULE-SET,apple,Apple
+  - RULE-SET,apple_ip,Apple,no-resolve
   - RULE-SET,telegram,Telegram
   - RULE-SET,telegram_ip,Telegram,no-resolve
   - RULE-SET,steam,Steam

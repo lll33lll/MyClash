@@ -178,13 +178,13 @@ const rateRegionDefinitions = [
   {
     name: lowRateRegionName,
     regex:
-      /^(?!.*(?:剩|期)).*(?:(?<!\d)0\.[0-5]|(?<=[ |｜丨∣┃\-‐–—−－﹣])0[*×✕✖⨯⨉x倍])|(?:(?<=[ |｜丨∣┃\-‐–—−－﹣])[*×✕✖⨯⨉x]0(?= |倍|$))|^(?!.*(?:客户端|软件)).*下载|低倍|免费|(?<![A-Za-z])free(?![A-Za-z])/i,
+      /^(?!.*(?:剩|期)).*(?:(?<!\d)0\.[0-5]|(?<=[ \[\(|｜丨∣┃\-‐–—−－﹣])0[*×✕✖⨯⨉x倍])|(?:(?<=[ \[\(|｜丨∣┃\-‐–—−－﹣])[*×✕✖⨯⨉x]0(?=[ \)\]]|倍|$))|^(?!.*(?:客户端|软件)).*下载|低倍|免费|(?<![A-Za-z])free(?![A-Za-z])/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Available_1.png',
   },
   {
     name: highRateRegionName,
     regex:
-      /(?<=[ |｜丨∣┃\-‐–—−－﹣])((?:[*×✕✖⨯⨉x]\s*(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?)|(?:(?<![\d.])(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?\s*(?:倍|[*×✕✖⨯⨉x])))/i,
+      /(?<=[ \[\(|｜丨∣┃\-‐–—−－﹣])((?:[*×✕✖⨯⨉x]\s*(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?)|(?:(?<![\d.])(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?\s*(?:倍|[*×✕✖⨯⨉x])))/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png',
   },
 ];
@@ -439,9 +439,15 @@ const serviceConfigs = [
         path: './ruleset/microsoft.mrs',
         'path-in-bundle': 'geo/geosite/microsoft.mrs',
       },
+      microsoft_ip: {
+        ...ruleProviderCommonIpcidr,
+        url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/microsoft.mrs',
+        path: './ruleset/microsoft_ip.mrs',
+        'path-in-bundle': 'geo/geoip/microsoft.mrs',
+      },
     },
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Microsoft.png',
-    rules: ['RULE-SET,github,默认代理', 'RULE-SET,microsoft,Microsoft'],
+    rules: ['RULE-SET,github,默认代理', 'RULE-SET,microsoft,Microsoft', 'RULE-SET,microsoft_ip,Microsoft,no-resolve'],
   },
   {
     name: 'Apple',
@@ -454,9 +460,15 @@ const serviceConfigs = [
         path: './ruleset/apple.mrs',
         'path-in-bundle': 'geo/geosite/apple.mrs',
       },
+      apple_ip: {
+        ...ruleProviderCommonIpcidr,
+        url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/apple.mrs',
+        path: './ruleset/apple_ip.mrs',
+        'path-in-bundle': 'geo/geoip/apple.mrs',
+      },
     },
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple.png',
-    rules: ['RULE-SET,apple,Apple'],
+    rules: ['RULE-SET,apple,Apple', 'RULE-SET,apple_ip,Apple,no-resolve'],
   },
   {
     name: 'Telegram',
@@ -1409,7 +1421,12 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
     }
   }
 
-  const proxyServerPolicy = simplifyDomainPolicy(matchedProxyPolicy);
+  const matchedPolicyDomains = Object.keys(matchedProxyPolicy);
+  const proxyServerPolicy =
+    proxyDomains.size === matchedPolicyDomains.length &&
+    matchedPolicyDomains.every((domain) => proxyDomains.has(domain.toLowerCase()))
+      ? simplifyDomainPolicy(matchedProxyPolicy)
+      : matchedProxyPolicy;
 
   const originalFakeIpFilter = originalDnsConfig['fake-ip-filter'] || [];
   const proxyFakeIpFilter = originalFakeIpFilter.filter((pattern) => {
@@ -1426,7 +1443,13 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
     'enhanced-mode': 'fake-ip',
     'fake-ip-range': '198.18.0.1/15',
     'fake-ip-range6': '2001:2::1/48',
-    'fake-ip-filter': ['rule-set:private', 'rule-set:fakeip_filter', 'rule-set:geolocation-cn', ...proxyFakeIpFilter],
+    'fake-ip-filter': [
+      'rule-set:private',
+      'rule-set:fakeip_filter',
+      'rule-set:geolocation-cn',
+      ...(ruleOptionsEnable['FCM'] ? ['rule-set:googlefcm'] : []),
+      ...proxyFakeIpFilter,
+    ],
     'proxy-server-nameserver': chinaDohDNS,
     ...(Object.keys(proxyServerPolicy).length > 0 && {
       'proxy-server-nameserver-policy': proxyServerPolicy,
