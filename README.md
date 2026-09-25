@@ -61,7 +61,7 @@
 [mihomoScript.js](/Script/mihomoScript.js)，复制下面这个链接使用👇👇👇
 
 ```text
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/mihomoScript.js
+https://raw.githubusercontent.com/lll33lll/MyClash/main/Script/mihomoScript.js
 ```
 
 - **精简版**
@@ -69,7 +69,7 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/mihomoScript.js
 [Script.js](/Script/Script.js)，复制下面这个链接使用👇👇👇
 
 ```text
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/Script.js
+https://raw.githubusercontent.com/lll33lll/MyClash/main/Script/Script.js
 ```
 
 |                                                                                   |
@@ -97,7 +97,7 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/Script.js
 [mihomoConfig.yaml](/Config/mihomoConfig.yaml)，复制下面这个链接使用👇👇👇
 
 ```text
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfig.yaml
+https://raw.githubusercontent.com/lll33lll/MyClash/main/Config/mihomoConfig.yaml
 ```
 
 - **精简版**
@@ -105,7 +105,7 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfig.yaml
 [mihomoConfigLite.yaml](/Config/mihomoConfigLite.yaml)，复制下面这个链接使用👇👇👇
 
 ```text
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfigLite.yaml
+https://raw.githubusercontent.com/lll33lll/MyClash/main/Config/mihomoConfigLite.yaml
 ```
 
 ---
