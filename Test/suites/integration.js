@@ -340,6 +340,23 @@ function runIntegrationTests(h, api, meta, fx, loadScript, scriptFile) {
       h.assert(groupByName(out['proxy-groups'], '香港'), '香港组仍应存在');
     }),
   );
+  h.test('默认关闭自动测速：无自动测速类型策略组，且策略组不带健康检查字段', () => {
+    for (const cfg of [fx.typicalSubscription(), fx.minimalSubscription()]) {
+      const out = api.main(cfg);
+      for (const g of out['proxy-groups']) {
+        h.assert(!['url-test', 'load-balance', 'fallback'].includes(g.type), '策略组 ' + g.name + ' 不应为自动测速类型');
+        h.assert(!('interval' in g), '策略组 ' + g.name + ' 不应带 interval');
+        h.assert(!('url' in g), '策略组 ' + g.name + ' 不应带 url');
+      }
+    }
+  });
+  h.test('打开开关可恢复自动测速组（自动选择 / 地区自动选择）', () =>
+    withOptions(api, { 自动选择: true, 生成地区自动选择组: true }, () => {
+      const out = api.main(fx.minimalSubscription());
+      h.assert(out['proxy-groups'].some((g) => g.name === '自动选择' && g.type === 'url-test'), '应恢复「自动选择」组');
+      h.assert(out['proxy-groups'].some((g) => g.name.endsWith('-自动选择') && g.type === 'url-test'), '应恢复地区自动选择组');
+    }),
+  );
   h.test('隐藏地区手动选择组=true → 地区组 hidden', () =>
     withOptions(api, { 隐藏地区手动选择组: true }, () => {
       const out = api.main(fx.minimalSubscription());

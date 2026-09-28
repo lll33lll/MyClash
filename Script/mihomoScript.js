@@ -19,8 +19,8 @@ const Compatible_With_Bettbox = { ruleOptionsEnable: true };
 const ruleOptionsEnable = {
   // 基础策略组
   手动选择: true, // 是否启用手动选择策略组
-  自动选择: true, // 是否启用自动选择策略组
-  负载均衡: true, // 是否启用负载均衡策略组
+  自动选择: false, // 是否启用自动选择策略组（默认关闭：url-test 会持续自动测速）
+  负载均衡: false, // 是否启用负载均衡策略组（默认关闭：load-balance 会持续健康检查）
 
   // 以下为分流策略配置
   FCM: true, // GoogleFCM服务
@@ -46,7 +46,7 @@ const ruleOptionsEnable = {
 
   // 以下为非分流策略配置
   极简模式: false, // 是否启用极简模式
-  生成地区自动选择组: true, // 是否生成地区自动选择策略组
+  生成地区自动选择组: false, // 是否生成地区自动选择策略组（默认关闭：避免内核自动测速）
   隐藏地区手动选择组: false, // 是否隐藏地区手动选择策略组
   生成倍率组: true, // 是否生成低倍率/高倍率策略组
   分流组添加所有节点: false, // 是否为分流策略组添加所有节点
@@ -321,10 +321,10 @@ const groupBaseOption = {
   'empty-fallback': 'REJECT',
 };
 
-// select策略组通用配置
+// select策略组通用配置（不带健康检查字段，内核不会对 select 组自动测速）
 const selectBaseOption = {
-  ...groupBaseOption,
   type: 'select',
+  'empty-fallback': 'REJECT',
 };
 
 // url-test策略组通用配置
