@@ -22,11 +22,11 @@
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 原始位图参考                     | `Icons/png/<Name>.png`                                                                                                                                                                                                                                     |
 | 统一化矢量（对外提供的就是这套） | `Icons/svg/<Name>.svg`                                                                                                                                                                                                                                     |
-| 命名                             | PascalCase、无下划线/连字符；png 与 svg **同名一一对应**（当前 37 对）                                                                                                                                                                                     |
-| 引用格式                         | `https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/<Name>.svg`；**JS 脚本里前缀已提为 `iconBaseUrl`**，写成 `` `${iconBaseUrl}<Name>.svg` ``；YAML 不支持变量，仍写全量                                                                       |
-| 引用位置                         | `Script/mihomoScript.js`（42）、`Script/Script.js`（24）、`Config/mihomoConfig.yaml`（34）、`Config/mihomoConfigLite.yaml`（18）（共 118 处）                                                                                                              |
-| 规则集引用                       | 脚本里已提为 `const ruleSetBaseUrl`（`…/gh/appshubcc/bett-rules@meta/geo/`），写成 `` `${ruleSetBaseUrl}geosite/<name>.mrs` ``；`path-in-bundle` 是包内本地路径，与之无关；少数第三方规则集（Emby / emos / adblock / cn-additional）仓库不同，仍写全量 URL |
-| 回归测试                         | `node Test/run-tests.js`（改过脚本必跑，当前 192 项；含 ES2020 语法检查与 QuickJS 实跑 `main()`）                                                                                                                                                          |
+| 命名                             | PascalCase、无下划线/连字符；png 与 svg **同名一一对应**（当前 39 对）                                                                                                                                                                                     |
+| 引用格式                         | `https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/<Name>.svg`；**JS 脚本里前缀已提为 `iconBaseUrl`**，写成 `` `${iconBaseUrl}<Name>.svg` ``；YAML 不支持变量，仍写全量                                                                       |
+| 引用位置                         | `Script/mihomoScript.js`（43）、`Script/Script.js`（24）、`Config/mihomoConfig.yaml`（36）、`Config/mihomoConfigLite.yaml`（18）（共 121 处）                                                                                                              |
+| 规则集引用                       | 脚本里已提为 `const ruleSetBaseUrl`（`…/gh/appshubcc/bett-rules@meta/geo/`），写成 `` `${ruleSetBaseUrl}geosite/<name>.mrs` ``；`path-in-bundle` 是包内本地路径，与之无关；少数第三方规则集（Emby / emos / cn-additional）仓库不同，仍写全量 URL |
+| 回归测试                         | `node Test/run-tests.js`（改过脚本必跑，当前 198 项；含 ES2020 语法检查与 QuickJS 实跑 `main()`）                                                                                                                                                          |
 
 ---
 
@@ -51,10 +51,10 @@
   3. **圆形 / 近圆形一律不动**（圆形徽章、圆角徽章、环形、八边形…）。⚠️ 别用「方形度 = 短边/长边」去筛：满圆也是 **1.000**，与方形无法区分（2026-09-28 首次自动判定即因此误伤 6 个圆形徽章，被用户当场纠正）；
   4. **国旗（America / Japan / HongKong / China / Taiwan / Singapore）一律不动**；字形、宽扁、细线稿类同样不动；
   5. 缩放只改最外层 `transform`（`translate(512+k(tx−512), 512+k(ty−512)) scale(k·s)`，绕画布中心 ⇒ 居中不变），几何 / 渐变 / 结构一字不动；白名单**分两档**：**尖角方形 −10%（`k=0.90`）**、**四角弧形的方形 −5%（`k=0.95`）**，当前名单与判定依据见 §5.17。
-- ⚠️ **唯一允许的「非等比」例外：`OpenAI.svg` 用 `scale(sx sy)`**（2026-09-28 用户要求"左右两边紧贴画布边缘"）：官方矢量内容盒 256.03×259.53 ⇒ 长宽比 0.9865，等比归一后左右各留 6.75px，故把 x 单独放大 **1.336%** 补满 1024×1024 —— `translate(11.0206 10.8145) scale(3.9139042 3.8623049)`。**其余 36 个图标一律等比，别把这个例外"修回"等比**（起因、取舍与验收见 §5.18）。Flutter 侧已核：`vector_graphics_compiler` 的 `_parseSvgScale` 支持 1~2 个参数。
-- `transform` 只有 `tx/ty` 全为 0 且 `s == 1` 时才省略（如 EHentai）。
+- ⚠️ **唯一允许的「非等比」例外：`OpenAI.svg` 用 `scale(sx sy)`**（2026-09-28 用户要求"左右两边紧贴画布边缘"）：官方矢量内容盒 256.03×259.53 ⇒ 长宽比 0.9865，等比归一后左右各留 6.75px，故把 x 单独放大 **1.336%** 补满 1024×1024 —— `translate(11.0206 10.8145) scale(3.9139042 3.8623049)`。**其余 37 个图标一律等比，别把这个例外"修回"等比**（起因、取舍与验收见 §5.18）。Flutter 侧已核：`vector_graphics_compiler` 的 `_parseSvgScale` 支持 1~2 个参数。
+- `transform` 只有 `tx/ty` 全为 0 且 `s == 1` 时才省略（**整份连外层 `<g>` 一起省**，直接 `<defs>` + 图形元素；当前唯一实例是 `Patreon.svg` —— 圆正好铺满画布）。⚠️ 原文举的 `EHentai` 有误：它 `scale(1.6461000)`，必须带 `<g>`。
 - **除这个最外层 `<g>` 外，不要再靠 `transform` 搬图形**：要整组平移/缩放，就**直接改坐标数值**（坐标改完若内容包围盒变了，再按上面两式重算 `tx/ty/s`）。理由：内容坐标才是这套文件的"真身"，多一层 `transform` 等于同一几何存在两套坐标 —— §5 的按坐标审计、§4.2 的回归基线全部对不上，还容易被当成 §1.3 的「无操作 `transform`」顺手删掉。2026-09-26 起 `America`（§5.11）/ `Singapore`（§5.12）的内部图案位移已写回坐标。
-- 文件风格：LF 换行、2 空格缩进、一个标签一行、属性不折行；不加 `<?xml?>` 声明。
+- 文件风格：**CRLF 换行**（全仓库 39 个文件实测都是 CRLF；写入时用 `open(..., newline="")` 保留，理由见 §5.17）、**4 空格缩进**为主（`EHentai` / `HongKong` / `Japan` / `Proxy` / `RoundRobin` / `Server` / `WorldMap` 等历史文件是 2 空格或混用，别顺手重排）、一个标签一行、属性不折行；不加 `<?xml?>` 声明。⚠️ 本节原写"LF 换行、2 空格缩进"与仓库实际不符，已按实测更正（2026-10-04）。
 - 渐变坐标**不用改**：`userSpaceOnUse` 的坐标随外层 `scale` 一起缩放；`objectBoundingBox` 本来就与坐标无关。
 - **默认带渐变**：每条上色 `path` 的 `fill` 用 `linearGradient`（做法与验收见 §1.4），不要写成纯色。
 
@@ -102,6 +102,8 @@ const box = [vbX + x0 * upp, vbY + y0 * upp, (x1 - x0 + 1) * upp, (y1 - y0 + 1) 
 2. 渐变范围取**内容盒的 y 起止**，不是 `0`~`1024`（EHentai `y 0~480`、Fcm `y 0~1640`、PayPal `y 3~48`）；`x1=x2=0` 即纯竖直；
 3. 方向统一 **亮端在上（`offset="0"`）、暗端在下（`offset="100%"`）**，与 YouTube 同向；
 4. 每条 path 都写**显式** `fill="url(#id)"`（理由见 §2.1，别靠继承）；id 用 `<图标名小写><序号>`（`fcm1` / `paypal3`）。
+
+⚠️ **容器已经是纯黑（或已到该色亮度下限）时**：`该色 × 0.88` 是空操作，对容器写渐变等于白写 —— **这种图标按纯色交付，别自作主张把渐变挪到白色字形上**。`Patreon.svg`（纯黑圆底 + 纯白 P）就是定稿实例：2026-10-04 先做过"白字形 `#FFFFFF → #E0E0E0`"的折中版，被用户当轮否掉，最终**整份不加渐变、无 `<defs>`**（见 §4.1）。白字形在有色容器上仍按既有惯例保持纯白（Telegram / Spotify / Line / Steam / Bitcoin）。
 
 **分层图标的关键**：所有层用**同一对 `y1/y2`**（同一个父 `<g>` 下），这样各层"变暗比例"完全一致 → 层次与配色关系照旧，只多一层上亮下暗的 shading。**绝不能**把多层合并成一条整体渐变（Fcm 第一次就是这么错的，花色层次全丢）。
 
@@ -170,7 +172,7 @@ const box = [vbX + x0 * upp, vbY + y0 * upp, (x1 - x0 + 1) * upp, (y1 - y0 + 1) 
 2. 元素都在白名单内，且没有 `<style>` / `<filter>` / `fe*` / `<mask>` / `xlink:` / `class=`；
 3. 所有 `url(#id)` 与 `href="#id"` 都能解析到定义（悬空引用 = 画面直接缺块）；
 4. `clipPath` 的子元素只能是形状或 `use`。
-5. **`transform` 只准出现在最外层那个规范化 `<g>` 上**（正则：全文 `transform="` 只能命中 1 次，且形状必须是 `translate(tx ty) scale(s)`）。`Icons/svg/` 现有例外只有 `Google.svg`（描摹遗留的 `<g clip-path+matrix>`）和 `HongKong.svg`（15 个 `<use rotate>`，§5.5 的 5 重对称复用）—— 新文件一律不要走这条路（§1.1）。
+5. **`transform` 只准出现在最外层那个规范化 `<g>` 上**（正则：全文 `transform="` 命中 **0 或 1** 次；命中 1 次时形状必须是 `translate(tx ty) scale(s)`；命中 0 次即 §1.1 的「`s==1` 且 `tx=ty=0`」情形，当前仅 `Patreon.svg`）。`Icons/svg/` 现有例外只有 `Google.svg`（描摹遗留的 `<g clip-path+matrix>`）和 `HongKong.svg`（15 个 `<use rotate>`，§5.5 的 5 重对称复用）—— 新文件一律不要走这条路（§1.1）。
 
 ### 2.1 渲染器健壮性：别依赖 `fill` 继承（真机踩坑）
 
@@ -264,6 +266,7 @@ vtracer.exe -i in.png -o out.svg --clustering color-cluster --hierarchical cutou
 | `PikPak.svg`                 | 白色箱体轮廓上 **4 处直线段接点折角**：左壁顶 `V342.02`→`l17.07-40.28` **+22.97°**、右壁顶 `l15.7 37.55`→`v201.04` **+22.69°**、底部两角（19.4 单位短斜线↔平底 `H212.99`）各 **+26.10°** —— 即用户说的"左右和底部两个直线转折处"。放大对照确认**设计原意是圆角**（144px 参考位图分辨率 ±7px 下位置已吻合在 ±2px 内，差的是切向连续性）；白色轮廓另有 5 处 ≤3.7° 的 C→C 小折角与 2 个 flap 针尖（−172.7°）+ 顶部缺口 3 个设计角（−55.6°/+40.5°/−40.3°），后者**属设计意图，勿动** | 2026-09-28：4 处 L→L 角做**相切圆角 fillet**（§5.9 方法：切点取在两条直线上，`t=R·tan(Δ/2)`，圆弧转单段三次贝塞尔 `k=4/3·tan(Δ/4)`）。用户未给官方矢量，圆角大小低于参考位图分辨率、按放大目测定 **t_top=16 / t_bot=12**（R≈79/52 内容单位，切角深度仅 1.6/1.2 单位）。只替换白色 path `d`（599→**730 字符**，25→29 段，骨架逐字节未动）；坐标 2 位小数。fillet 两端接点残差 **<0.5°**；其余接点角度逐一保持（apex +40.483/−40.338 位不变）。折角 >0.5°：18→**14**（4 个目标全消）。三档栅格 diff vs 改前 1024/64/24 = **0.0177/0.0242/0.0417**（阈值 1/255），改动像素仅 0.038% 且全部落在 4 个角窗口内；§2 清单全过；可见盒 1,1,1023,1022 不变。<br>**踩坑**：① 原文件里有 `−47.793.07`/`−35.54.1` 这类**无分隔符打包**——按 SVG 数字流语法贪心解析是 `−47.793`+`.07`（3 位小数！），**手算累加会错、解析器没问题**；重新发射时归一到 2 位小数即可（接点角仅变 0.023°）。② `fmt()` 对**负零**（`−0.00`）必须归到 `0`，否则吐出裸 `−` 直接毁掉 token 拼装（§1.3 同类陷阱）。③ 底边 `H` 段**同时是右下角的出边和左下角的入边**（共享段），逐段遍历时必须用"笔位精确落点"法而不是跳段。④ `z` 闭合点有 0.04 单位缺口 + 浮点残差，审计要把 <0.01 单位的段当零长丢弃，且曲线入切向是 `c1−start` 不是 `c2−start` |
 | `OpenAI.svg` / `Bitcoin.svg` | 用户在统一化之后手工改过（更短路径 / 4 空格 + 属性折行）                                                                                                                                                                                                                                                                                                                                                                                                                         | **不要**再按流程重跑覆盖                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `Auto.svg` / `Bypass.svg`    | 也是用户手工改过的（4 空格 + 属性折行）；闪电/箭头的**直边被描摹成微弯的曲线**                                                                                                                                                                                                                                                                                                                                                                                                   | 2026-09-24 只重写 `d`（保留原有排版与其它路径），见 §5.8                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `GitHub.svg`                 | 用户指定源：thesvg `github/mono.svg`（24 box，单条 path = 圆底 + 猫形**镂空子路径**，无 `fill` ⇒ 默认纯黑）；配色参照 Qure `IconSet/Color/GitHub.png`（紫底 + 白猫，只有位图、无矢量）                                                                                                                                                                                                                                                                                          | 2026-10-17 统一化新增（配套全量版 `GitHub` 分流组，紧跟 `Microsoft` 之前）。path 原样沿用（官方矢量，按 §5.15 不磨描摹稿），坐标保持 3 位小数（含 `.015`/`.108` 短段，符合 §1.3 例外）；内容盒 **0, 0.297, 24, 23.4057** ⇒ `translate(0 0.0057) scale(42.6666667)`。**渐变**按 §3.2 第 3 步对参考位图的紫色像素逐行均值线性拟合（rms 可忽略）：`#C345D3 → #492C78`（上亮下暗，`y .3~23.7` 即内容盒 y 起止）；**没有**套 §1.4 的 ×0.88，因为用户点名以参考图的紫色为准。镂空猫形**留透明**（不补白色），交付形态与 mono 源一致。验收：浏览器渲染可见盒 x 0..1023 / y 13..1010（最长边 1024、上下余量 13/13）；行均值 y100 `#B842CA` → y900 `#562E82` 单调变暗；§2 清单全过（`transform` 计数 1、单 path、无 style/filter/mask/xlink）|
 
 ### 4.2 已规整的瑕疵（回归基线）
 
@@ -292,9 +295,11 @@ vtracer.exe -i in.png -o out.svg --clustering color-cluster --hierarchical cutou
 | `OpenAI.svg` | 整份是 **vtracer 描摹 144px 位图**的产物，不是官方矢量：92 段里 86 段是曲线，**κ 突跳 44 处**（最差 ×1021）、**44 段段内 κ 变号**、`Rmin_canvas` 仅 **0.62 px**（比描摹源分辨率还小 ⇒ 纯噪声）；同时墨水占比 **48.5%** vs 官方 **38.0%**（辫子粗 ~27%、瓣间缝隙更浅、中心六边形孔更小）—— 用户反馈的"线条不平滑"其实是**描摹噪声 + 比例偏粗**两件事 | 2026-09-28 用户提供了官方 SVG（256×260，8 子路径、含 `a` 弧命令），**直接换稿**（方法见 §5.15，用户已确认接受官方标准比例）。只替换 `d`，仓库骨架（1024 画布 / 外层 `<g>` / 4 空格 + 属性折行的手写排版 / `gradient_0` 与 `#0C9B7A→#1BF2D1`）**全部保留**；`transform` 按新内容盒 `0,0,256,259.527` 重算为 `translate(6.9578 0) scale(3.9456447)`；渐变端点按**在旧内容盒里的相对位置**映射到新盒（§4.1：该渐变是用户手工调过的，不套 §1.4 默认值）。成品 3894→**2099 B**、92→**72 段**（`L=36 C=36`）：κ 突跳 **44→0**、κ 变号 **44→0**、`Rmin_canvas` **0.62→2.82 px**；与官方原稿的 1024px alpha 逐像素 diff = **mean 0.00000 / max 0 / `px>8` 0**。⚠️ **kink 数没有下降**（50→45）是正常的——官方 logo 本就是多边形辫子，那些是**设计尖角**；判据看 κ 突跳。⚠️ 新旧栅格 diff 1024/64/24 = 20.1/20.0/16.4 属**外观替换的预期值**，不是回归，**勿回退**为描摹稿 |
 
 | `OpenAI.svg` | 换稿换来"**线变细了**"：官方矢量的辫子线宽只有 **p10/p25/p50/众数 = 46.0/53.1/66.5/67.0 px**、墨水 37.46%，而用户说的"原来的粗细"（描摹稿；144px 参考位图同口径段长 11.0/12.0/15.0）是 **68.0/76.5/86.6/86.5 px**、墨水 47.90% —— 差 **20px@1024**，肉眼一眼可见 | 2026-09-28：**只加粗、不动形状**。给唯一那条 path 补 `stroke="url(#gradient_0)" stroke-width="5.6" stroke-linejoin="round"`（= 以 ρ=2.8 内容单位对墨迹做**精确 Minkowski 膨胀**，`d` 一字未改），外层 `transform` 按**膨胀后**的内容盒重算为 `translate(17.6253 10.8145) scale(3.8623049)`（见 §5.16）。实测线宽 **68.0/77.7/86.6/86.5 px**、墨水 47.77%、与旧版 IoU **0.9817**、平均色差 **1.363/255**（改前是 0.7809 / 25.5）；可见盒仍最长边 1024、左右余量 6.75/6.75 相等（短边 1017→1010.5，是"最长边恒 1024"的必然值）。**勿回退**为官方原始细线——用户要的就是原来的粗细 |
-| `OpenAI.svg` | 换稿后发现**左右两边不紧贴画布边缘**：官方矢量内容盒 **256.03 × 259.53（宽/高 = 0.9865，天生高 1.35%）**，按 §1.1 等比归一（最长边 1024）后必然左右各留 6.75px；实测可见盒 1010.50 × 1024（左右余量 6.75/6.75 相等，上下顶满） | 2026-09-28 用户要求"左右两边紧贴画布边缘"：把 x 单独放大 **1.336%**，`transform` 写成非等比两参数 —— `translate(11.0206 10.8145) scale(3.9139042 3.8623049)`（方法、为何不能等比放大/旋转、代价见 §5.18）。实测可见盒 **1024.000 × 1024.000、四边余量全 0**；`transform` 计数 1、无禁用元素、`url(#gradient_0)` 可解析、CRLF/15 行版式不变。⚠️ 这是全仓库**唯一**的非等比 `transform`，**勿"修回"等比**（其余 36 个仍按 §1.1 等比） |
+| `OpenAI.svg` | 换稿后发现**左右两边不紧贴画布边缘**：官方矢量内容盒 **256.03 × 259.53（宽/高 = 0.9865，天生高 1.35%）**，按 §1.1 等比归一（最长边 1024）后必然左右各留 6.75px；实测可见盒 1010.50 × 1024（左右余量 6.75/6.75 相等，上下顶满） | 2026-09-28 用户要求"左右两边紧贴画布边缘"：把 x 单独放大 **1.336%**，`transform` 写成非等比两参数 —— `translate(11.0206 10.8145) scale(3.9139042 3.8623049)`（方法、为何不能等比放大/旋转、代价见 §5.18）。实测可见盒 **1024.000 × 1024.000、四边余量全 0**；`transform` 计数 1、无禁用元素、`url(#gradient_0)` 可解析、CRLF/15 行版式不变。⚠️ 这是全仓库**唯一**的非等比 `transform`，**勿"修回"等比**（其余 37 个仍按 §1.1 等比） |
 
 | `Microsoft / EHentai`（−10%）、`PikPak / Static`（−5%） | **"看着有大有小"**：外层归一化早已统一（最长边 1024），但方形/块状图案（Microsoft 四色方块墨迹占画布 90.5%、PikPak 圆角方形徽章 95.8%）与字形类（WorldMap 25.9%）同框时明显"大一圈" | 2026-09-28 用户定稿：**只按白名单缩放，分两档**——**尖角方形**（Microsoft、EHentai）`k=0.90`；**四角弧形的方形**（PikPak、Static）`k=0.95`（用户："static/pikpak 这类四角是弧形的方形图案改为缩小 5%"）。判定用"角窗墨迹占比"：≈100% = 尖角、20~45% = 弧形角（PikPak 41%/r≈6.2%、Static 19%/r≈8%）。`Server.svg` 按用户指示**移出白名单并回退**（`k=1.0`）。只改外层 `transform` 一行（`translate(512+k(tx−512), 512+k(ty−512)) scale(k·s)`）。验收：忽略行尾后 **32 个文件与基线逐字节相同**、只有 Microsoft/EHentai/PikPak/Static 4 个差 `transform` token；实测 `d_墨` 比值 **0.899 / 0.900 / 0.950 / 0.950 / 1.000(Server)**；37 个文件行尾统一 CRLF。⚠️ 同日先按形状指标自动判定选出 16 个（误含 6 个圆形徽章，满圆的"方形度"同为 1.000）→ 用户纠正为白名单制；**勿再自动判定** |
+
+| `Patreon.svg` | 用户提供的源图：`<circle style="fill:#000">` 黑底徽章 + `<path style="fill:#fff">` 白色 P；坐标 3 位小数、无 `width/height`、无渐变 | 2026-10-04 统一化新增（配套全量版 `Patreon` 分流组）：内容盒 = 圆本身（`cx=512 cy=512 r=512`）**正好铺满画布** ⇒ `s=1 / tx=ty=0`，按 §1.1 末条**整份省略外层 `<g>`**（38 个图标里的首例）；`style="fill:…"` 内联为 `fill` 属性；路径由相对 `M/c/z` 转**绝对坐标 + 2 位小数**（7 段三次贝塞尔、`d` 302 字符、最短控制柄 65 单位 ⇒ 无 §1.3 的短段量化折角风险）；4 空格缩进 + 全 CRLF。**渐变**：用户 2026-10-04 明确要求**不加渐变** ⇒ 纯黑底 `fill="#000000"` + 纯白字形 `fill="#FFFFFF"`（`#fff`→`#FFFFFF` 按 §2.1 写全），整份**没有 `<defs>`**。曾先按 §1.4 默认做过"容器纯黑 + 白字形 `#FFFFFF → #E0E0E0`"的版本（因为 `#000000 × 0.88` 仍是纯黑，对容器写渐变是空操作），用户当轮否掉 ⇒ **黑底这类图标直接按纯色交付，别自作主张给白字形补渐变**（§1.4 尾注同步改了）。验收：可见盒 **0,0,1024,1024**（最长边 1024、四边余量 0；alpha 阈值 128 / 3 两档一致）；§2 清单全过（`transform` 计数 **0**、无 `<defs>`/style/filter/mask/xlink/class、fill 只写在 circle 与 path 上、4 行全 CRLF）；与源图 1024px 逐像素 **mean 0.0007 / max 16 / px>8 = 60**（全部来自坐标 2 位小数量化，**alpha 通道逐像素零差异**）；`node Test/run-tests.js` **192 项全绿** |
 
 ### 4.3 不经修改的已知项（属设计或源图固有，别再当瑕疵改）
 
@@ -804,10 +809,10 @@ Singapore 实测：`C1 (249.4028, 330.6168) R1 132.9217`（rms 0.72）、`C2 (34
 - 引用格式（**CDN 前缀固定不变**）：
 
 ```txt
-https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/<Name>.svg
+https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/<Name>.svg
 ```
 
-- 改完必须审计：4 个文件里所有 `fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/(svg|png)/...` 的目标文件都存在，且没有残留的第三方图标 CDN（Koolson / MiToverG422 / lige47）。
+- 改完必须审计：4 个文件里所有 `cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/(svg|png)/...` 的目标文件都存在，且没有残留的第三方图标 CDN（Koolson / MiToverG422 / lige47）。
 - jsDelivr 走 `@main` 分支，**commit + push 之后**链接才生效。
 - ⚠️ Windows 下仅大小写不同的改名（`fcm.png` → `Fcm.png`）git 可能不记录 → 必要时 `git rm --cached <旧名>` 再 `git add <新名>`，保证 index 里的文件名与 URL 逐字符一致。
 
@@ -842,8 +847,8 @@ Start-Process -FilePath "<python.exe>" -ArgumentList '-m','http.server','8765','
 
 ---
 
-## 9. 当前图标清单（37）
+## 9. 当前图标清单（39）
 
-`AdBlock, Airport, America, Apple, Auto, Available, Bitcoin, Bypass, OpenAI, China, EHentai, Emby, Fcm, Global, Google, HongKong, Japan, Line, Meta, Microsoft, Netflix, PayPal, PikPak, Proxy, RoundRobin, Server, Singapore, Spotify, Stack, Static, Steam, Taiwan, Telegram, TikTok, Twitter, WorldMap, YouTube`
+`AdBlock, Airport, America, Apple, Auto, Available, Bitcoin, Bypass, OpenAI, China, EHentai, Emby, Fcm, GitHub, Global, Google, HongKong, Japan, Line, Meta, Microsoft, Netflix, PayPal, Patreon, PikPak, Proxy, RoundRobin, Server, Singapore, Spotify, Stack, Static, Steam, Taiwan, Telegram, TikTok, Twitter, WorldMap, YouTube`
 
 每个文件里都已烘焙好 `translate(tx ty) scale(s)`，需要复现规则时直接读该文件的 `transform` 即可。
