@@ -86,4 +86,6 @@ for (const { file, switches } of FORK_SCRIPTS) {
     console.log('  ' + file + '：已恢复「关闭自动测速 / 关闭去广告」的 fork 默认');
   }
 }
-console.log(forkPatched ? '✓ 已恢复 fork 默认（关闭自动测速 / 关闭去广告）' : 'fork 默认（关闭自动测速 / 关闭去广告）未被改动');
+console.log(
+  forkPatched ? '✓ 已恢复 fork 默认（关闭自动测速 / 关闭去广告）' : 'fork 默认（关闭自动测速 / 关闭去广告）未被改动',
+);

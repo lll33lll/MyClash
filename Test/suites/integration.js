@@ -365,7 +365,10 @@ function runIntegrationTests(h, api, meta, fx, loadScript, scriptFile) {
     for (const cfg of [fx.typicalSubscription(), fx.minimalSubscription()]) {
       const out = api.main(cfg);
       for (const g of out['proxy-groups']) {
-        h.assert(!['url-test', 'load-balance', 'fallback'].includes(g.type), '策略组 ' + g.name + ' 不应为自动测速类型');
+        h.assert(
+          !['url-test', 'load-balance', 'fallback'].includes(g.type),
+          '策略组 ' + g.name + ' 不应为自动测速类型',
+        );
         h.assert(!('interval' in g), '策略组 ' + g.name + ' 不应带 interval');
         h.assert(!('url' in g), '策略组 ' + g.name + ' 不应带 url');
       }
@@ -374,8 +377,14 @@ function runIntegrationTests(h, api, meta, fx, loadScript, scriptFile) {
   h.test('打开开关可恢复自动测速组（自动选择 / 地区自动选择）', () =>
     withOptions(api, { 自动选择: true, 生成地区自动选择组: true }, () => {
       const out = api.main(fx.minimalSubscription());
-      h.assert(out['proxy-groups'].some((g) => g.name === '自动选择' && g.type === 'url-test'), '应恢复「自动选择」组');
-      h.assert(out['proxy-groups'].some((g) => g.name.endsWith('-自动选择') && g.type === 'url-test'), '应恢复地区自动选择组');
+      h.assert(
+        out['proxy-groups'].some((g) => g.name === '自动选择' && g.type === 'url-test'),
+        '应恢复「自动选择」组',
+      );
+      h.assert(
+        out['proxy-groups'].some((g) => g.name.endsWith('-自动选择') && g.type === 'url-test'),
+        '应恢复地区自动选择组',
+      );
     }),
   );
   h.test('隐藏地区手动选择组=true → 地区组 hidden', () =>
