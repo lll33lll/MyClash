@@ -26,7 +26,7 @@ const ruleOptionsEnable = {
   AI: true, // 国外AI服务
   Telegram: true, // Telegram通讯软件
   Steam: true, // Steam游戏平台
-  AdBlock: true, // 广告拦截
+  AdBlock: false, // 广告拦截（默认关闭）
 
   // 以下为非分流策略配置
   极简模式: false, // 是否启用极简模式
