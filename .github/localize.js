@@ -52,8 +52,8 @@ console.log(total ? `✓ 已指向 ${repo}` : '链接已是本仓库，无需改
 // 只做精确替换、可重复执行；找不到对应结构时只警告，不让同步失败。
 // ---------------------------------------------------------------------------
 const FORK_SCRIPTS = [
-  { file: 'Script/Script.js', switches: ['自动选择', '生成地区自动选择组'] },
-  { file: 'Script/mihomoScript.js', switches: ['自动选择', '负载均衡', '生成地区自动选择组'] },
+  { file: 'Script/Script.js', switches: ['自动选择', '生成地区自动选择组', 'AdBlock'] },
+  { file: 'Script/mihomoScript.js', switches: ['自动选择', '负载均衡', '生成地区自动选择组', 'AdBlock'] },
 ];
 const STRIPPED_SELECT_BASE = "const selectBaseOption = {\n  type: 'select',\n  'empty-fallback': 'REJECT',\n};";
 const LEGACY_SELECT_BASE = "const selectBaseOption = {\n  ...groupBaseOption,\n  type: 'select',\n};";
@@ -83,7 +83,7 @@ for (const { file, switches } of FORK_SCRIPTS) {
 
   if (out !== src) {
     fs.writeFileSync(file, out);
-    console.log('  ' + file + '：已恢复「关闭自动测速」的 fork 默认');
+    console.log('  ' + file + '：已恢复「关闭自动测速 / 关闭去广告」的 fork 默认');
   }
 }
-console.log(forkPatched ? '✓ 已恢复 fork 默认（关闭自动测速）' : 'fork 默认（关闭自动测速）未被改动');
+console.log(forkPatched ? '✓ 已恢复 fork 默认（关闭自动测速 / 关闭去广告）' : 'fork 默认（关闭自动测速 / 关闭去广告）未被改动');
