@@ -1,7 +1,8 @@
 name: 一次性同步上游
 
-# 只给本次手动同步用：合并 AIsouler/MyClash → 本地化 → 跑测试 → 推送。
-# 同步完成后请删除本文件与 .sync/trigger。
+# 只给本次手动同步用：合并 AIsouler/MyClash → 本地化 → 跑测试 → 推到临时分支。
+# 主分支可能开了保护，GITHUB_TOKEN 推不上去，所以推到 sync-out 分支，再由人工/PR 合入。
+# 同步完成后请删除本文件、.sync/trigger 与 sync-out 分支。
 
 on:
   push:
@@ -47,7 +48,7 @@ jobs:
           npm --prefix Test install
           node Test/run-tests.js
 
-      - name: 提交并推送
+      - name: 提交并推到 sync-out 分支
         run: |
           git add -A
           if git diff --staged --quiet; then
@@ -55,5 +56,5 @@ jobs:
           else
             git commit -m 'chore: 同步上游并本地化链接'
           fi
-          git pull --rebase --autostash origin main || true
-          git push
+          echo "HEAD=$(git rev-parse HEAD)"
+          git push origin HEAD:refs/heads/sync-out --force
