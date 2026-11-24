@@ -1,0 +1,59 @@
+name: 一次性同步上游
+
+# 只给本次手动同步用：合并 AIsouler/MyClash → 本地化 → 跑测试 → 推送。
+# 同步完成后请删除本文件与 .sync/trigger。
+
+on:
+  push:
+    branches: ['main']
+    paths:
+      - '.sync/trigger'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: 合并上游（冲突以上游为准）
+        run: |
+          git remote add upstream https://github.com/AIsouler/MyClash.git
+          git fetch --quiet upstream main
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          echo "本仓库：$(git rev-parse --short HEAD)"
+          echo "上游：  $(git rev-parse --short upstream/main)"
+          git merge -X theirs --no-edit upstream/main
+
+      - name: 本地化（README/Docs 链接 + fork 默认值）
+        run: node .github/localize.js
+
+      - name: 跑上游自带的测试
+        run: |
+          npm --prefix Test install
+          node Test/run-tests.js
+
+      - name: 提交并推送
+        run: |
+          git add -A
+          if git diff --staged --quiet; then
+            echo '无变化'
+          else
+            git commit -m 'chore: 同步上游并本地化链接'
+          fi
+          git pull --rebase --autostash origin main || true
+          git push

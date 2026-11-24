@@ -30,8 +30,16 @@ const pattern = new RegExp(
   'g',
 );
 
+// README 之外，Docs 下的说明文档也带脚本 / 配置链接，一起指向本仓库
+const LOCALIZE_FILES = ['README.md'];
+if (fs.existsSync('Docs')) {
+  for (const name of fs.readdirSync('Docs')) {
+    if (name.endsWith('.md')) LOCALIZE_FILES.push('Docs/' + name);
+  }
+}
+
 let total = 0;
-for (const file of ['README.md']) {
+for (const file of LOCALIZE_FILES) {
   if (!fs.existsSync(file)) continue;
   const src = fs.readFileSync(file, 'utf8');
   const out = src.replace(pattern, `https://raw.githubusercontent.com/${repo}/main/$1/`);
@@ -54,6 +62,9 @@ console.log(total ? `✓ 已指向 ${repo}` : '链接已是本仓库，无需改
 const FORK_SCRIPTS = [
   { file: 'Script/Script.js', switches: ['自动选择', '生成地区自动选择组', 'AdBlock'] },
   { file: 'Script/mihomoScript.js', switches: ['自动选择', '负载均衡', '生成地区自动选择组', 'AdBlock'] },
+  // 2026-11 上游新增的 Concord 内核脚本，同样套用 fork 默认
+  { file: 'Script/concordScript.js', switches: ['自动选择', '负载均衡', '生成地区自动选择组', 'AdBlock'] },
+  { file: 'Script/concordScriptLite.js', switches: ['自动选择', '生成地区自动选择组', 'AdBlock'] },
 ];
 const STRIPPED_SELECT_BASE = "const selectBaseOption = {\n  type: 'select',\n  'empty-fallback': 'REJECT',\n};";
 const LEGACY_SELECT_BASE = "const selectBaseOption = {\n  ...groupBaseOption,\n  type: 'select',\n};";
@@ -87,3 +98,58 @@ for (const { file, switches } of FORK_SCRIPTS) {
   }
 }
 console.log(forkPatched ? '✓ 已恢复 fork 默认（关闭自动测速）' : 'fork 默认（关闭自动测速）未被改动');
+
+// ---------------------------------------------------------------------------
+// fork 测试适配
+//
+// 上游有两条集成用例默认「自动选择」是开的（极简国内外分流模式的策略组清单、
+// 生成地区自动选择组的排列顺序）。fork 把「自动选择」默认关掉之后这两条会失败，
+// 这里在用例里显式打开「自动选择」，保留上游用例的原意。只做精确替换、可重复执行。
+// ---------------------------------------------------------------------------
+const FORK_TEST_PATCHES = [
+  {
+    file: 'Test/suites/integration.js',
+    from: 'withOptions(api, { 极简国内外分流模式: true }, () => {',
+    to: 'withOptions(api, { 极简国内外分流模式: true, 自动选择: true }, () => {',
+  },
+  {
+    file: 'Test/suites/integration.js',
+    from: `  h.test('生成地区自动选择组=true → 自动选择组排在地区组之后', () => {
+    const out = api.main(fx.minimalSubscription());
+    const names = out['proxy-groups'].map((g) => g.name);
+    const idx = names.indexOf('香港');
+    h.assert(idx >= 0, '应生成香港组');
+    h.assertEqual(names[idx + 1], '香港-自动选择', '自动选择组应紧跟其地区组之后');
+    h.assert(!names.slice(0, idx).includes('香港-自动选择'), '自动选择组不应排在地区组之前');
+    h.assert(groupByName(out['proxy-groups'], '香港').proxies.includes('香港-自动选择'), '地区组应包含自动选择组');
+  });`,
+    to: `  h.test('生成地区自动选择组=true → 自动选择组排在地区组之后', () =>
+    withOptions(api, { 自动选择: true, 生成地区自动选择组: true }, () => {
+      const out = api.main(fx.minimalSubscription());
+      const names = out['proxy-groups'].map((g) => g.name);
+      const idx = names.indexOf('香港');
+      h.assert(idx >= 0, '应生成香港组');
+      h.assertEqual(names[idx + 1], '香港-自动选择', '自动选择组应紧跟其地区组之后');
+      h.assert(!names.slice(0, idx).includes('香港-自动选择'), '自动选择组不应排在地区组之前');
+      h.assert(groupByName(out['proxy-groups'], '香港').proxies.includes('香港-自动选择'), '地区组应包含自动选择组');
+    }),
+  );`,
+  },
+];
+
+let testPatched = 0;
+for (const { file, from, to } of FORK_TEST_PATCHES) {
+  if (!fs.existsSync(file)) {
+    console.warn('  ⚠ ' + file + '：文件不存在，跳过测试适配');
+    continue;
+  }
+  const src = fs.readFileSync(file, 'utf8');
+  if (src.includes(to)) continue;
+  if (!src.includes(from)) {
+    console.warn('  ⚠ ' + file + '：找不到需要适配的用例，跳过（同步后请检查测试）');
+    continue;
+  }
+  fs.writeFileSync(file, src.replace(from, to));
+  testPatched++;
+}
+console.log(testPatched ? '✓ 已适配 fork 默认下的上游测试' : '测试无需适配');
