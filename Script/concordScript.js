@@ -20,8 +20,8 @@ const Compatible_With_Bettbox = { ruleOptionsEnable: true };
 const ruleOptionsEnable = {
   // 基础策略组
   手动选择: true, // 是否启用手动选择策略组
-  自动选择: true, // 是否启用自动选择策略组
-  负载均衡: true, // 是否启用负载均衡策略组
+  自动选择: false, // 是否启用自动选择策略组
+  负载均衡: false, // 是否启用负载均衡策略组
 
   // 以下为分流策略配置
   FCM: true, // GoogleFCM服务
@@ -45,11 +45,11 @@ const ruleOptionsEnable = {
   PayPal: true, // PayPal支付服务
   Patreon: true, // Patreon创作者赞助平台
   EHentai: true, // E-Hentai网站
-  AdBlock: true, // 广告拦截
+  AdBlock: false, // 广告拦截
 
   // 以下为非分流策略配置
   极简国内外分流模式: false, // 是否启用极简国内外分流模式
-  生成地区自动选择组: true, // 是否生成地区自动选择策略组
+  生成地区自动选择组: false, // 是否生成地区自动选择策略组
   隐藏地区手动选择组: false, // 是否隐藏地区手动选择策略组
   生成高低倍率组: true, // 是否生成低倍率/高倍率策略组
   生成家宽节点组: true, // 是否生成家宽（住宅/原生 IP）节点策略组
@@ -318,8 +318,8 @@ const groupBaseOption = {
 
 // select策略组通用配置
 const selectBaseOption = {
-  ...groupBaseOption,
   type: 'select',
+  'empty-fallback': 'REJECT',
 };
 
 // url-test策略组通用配置

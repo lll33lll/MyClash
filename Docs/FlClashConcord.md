@@ -22,13 +22,13 @@
 - 全量版
 
 ```text
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/concordScript.js
+https://raw.githubusercontent.com/lll33lll/MyClash/main/Script/concordScript.js
 ```
 
 - 精简版
 
 ```text
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/concordScriptLite.js
+https://raw.githubusercontent.com/lll33lll/MyClash/main/Script/concordScriptLite.js
 ```
 
 **导入步骤**
@@ -61,13 +61,13 @@ YAML 是静态配置，无法像脚本那样按订阅节点动态生成策略组
 - 全量版
 
 ```text
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/concordConfig.yaml
+https://raw.githubusercontent.com/lll33lll/MyClash/main/Config/concordConfig.yaml
 ```
 
 - 精简版
 
 ```text
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/concordConfigLite.yaml
+https://raw.githubusercontent.com/lll33lll/MyClash/main/Config/concordConfigLite.yaml
 ```
 
 导入方式：配置页 → 导入 → 通过URL导入，粘贴上面的链接。导入后记得编辑配置，把 `proxy-providers` 里 `provider1` 的 `url` 换成你的订阅链接（订阅需要解密时再填 `age-secret-key`）。
